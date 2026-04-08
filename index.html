@@ -1,1 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mon Calendrier Budget</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
+        .container { max-width: 500px; margin: 0 auto; }
+        
+        /* Style du Calendrier */
+        .calendar-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #1976d2; margin-bottom: 10px; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .day-name { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .day { padding: 8px 0; border-radius: 6px; font-size: 0.9rem; position: relative; border: 1px solid #f0f0f0; }
+        .day.has-event::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: #1976d2; border-radius: 50%; }
+        .day.today { background: #e3f2fd; border-color: #1976d2; font-weight: bold; }
+
+        /* Solde */
+        .solde-banque { background: #1976d2; color: white; border-radius: 10px; padding: 15px; text-align: center; margin-bottom: 15px; }
+        .solde-banque span { font-size: 1.6rem; font-weight: bold; display: block; }
+
+        /* Liste des prélèvements */
+        .list-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        th { background: #f8f9fa; color: #666; font-size: 0.75rem; }
+        .checked-row { background-color: #f1f8e9; color: #999; text-decoration: line-through; }
+        input[type="checkbox"] { width: 20px; height: 20px; }
+        .date-badge { font-size: 0.7rem; background: #eee; padding: 2px 5px; border-radius: 4px; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="solde-banque">
+        SOLDE BANCAIRE RÉEL (CIC)
+        <span id="solde-reel">0.00 €</span>
+    </div>
+
+    <div class="calendar-card">
+        <div class="calendar-header" id="month-name">Avril 2026</div>
+        <div class="days-grid" id="calendar-days">
+            <!-- Rempli par JavaScript -->
+        </div>
+    </div>
+
+    <div class="list-container">
+        <table>
+            <thead><tr><th>Pointage</th><th>Dépense</th><th>€</th></tr></thead>
+            <tbody id="budget-body">
+                <!-- Les lignes seront générées ici -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // TES DONNÉES (Tu peux changer le 'jour' ici)
+    const depenses = [
+        { jour: 1, nom: "Loyer", prix: 300 },
+        { jour: 2, nom: "Épargne sécurité", prix: 225 },
+        { jour: 5, nom: "SFR Box", prix: 47 },
+        { jour: 5, nom: "SFR Téléphone", prix: 18 },
+        { jour: 7, nom: "Assurance voiture", prix: 69.05 },
+        { jour: 8, nom: "Électricité", prix: 137.04 },
+        { jour: 10, nom: "L'eau", prix: 42.50 },
+        { jour: 12, nom: "Assurance maison", prix: 25.16 },
+        { jour: 15, nom: "Essence", prix: 150 },
+        { jour: 20, nom: "Cotisation CIC", prix: 13.35 },
+        { jour: 22, nom: "Prime Vidéo", prix: 6.99 },
+        { jour: 22, nom: "Paramount", prix: 4 },
+        { jour: 25, nom: "HP Imprimante", prix: 1.79 },
+        { jour: 28, nom: "Investissements (PEA/Crypto)", prix: 240 },
+        { jour: 30, nom: "Reliquat", prix: 35 }
+    ];
+
+    const revenus = 1800;
+
+    function init() {
+        renderCalendar();
+        renderList();
+        calculer();
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendar-days');
+        const labels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        labels.forEach(l => grid.innerHTML += `<div class="day-name">${l}</div>`);
+        
+        const now = new Date();
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        
+        for (let i = 1; i <= daysInMonth; i++) {
+            const hasEvent = depenses.some(d => d.jour === i);
+            const isToday = i === now.getDate();
+            grid.innerHTML += `<div class="day ${hasEvent ? 'has-event' : ''} ${isToday ? 'today' : ''}">${i}</div>`;
+        }
+    }
+
+    function renderList() {
+        const tbody = document.getElementById('budget-body');
+        // Trier par jour
+        depenses.sort((a, b) => a.jour - b.jour).forEach((d, index) => {
+            tbody.innerHTML += `
+                <tr class="item-row" id="row-${index}">
+                    <td><input type="checkbox" class="chk" onchange="calculer()" id="chk-${index}"></td>
+                    <td>
+                        <span class="date-badge">le ${d.jour}</span><br>
+                        <strong>${d.nom}</strong>
+                    </td>
+                    <td><input type="number" class="prix-val" value="${d.prix}" oninput="calculer()" step="0.01"></td>
+                </tr>
+            `;
+        });
+    }
+
+    function calculer() {
+        let solde = revenus;
+        const rows = document.querySelectorAll('.item-row');
+        
+        const checkStates = [];
+        const valueStates = [];
+
+        rows.forEach((row, i) => {
+            const cb = row.querySelector('.chk');
+            const p = parseFloat(row.querySelector('.prix-val').value) || 0;
+            
+            checkStates.push(cb.checked);
+            valueStates.push(p);
+
+            if (cb.checked) {
+                row.classList.add('checked-row');
+                solde -= p;
+            } else {
+                row.classList.remove('checked-row');
+            }
+        });
+
+        document.getElementById('solde-reel').innerText = solde.toFixed(2) + " €";
+        localStorage.setItem('budgetCalSave', JSON.stringify({checkStates, valueStates}));
+    }
+
+    window.onload = function() {
+        init();
+        const save = JSON.parse(localStorage.getItem('budgetCalSave'));
+        if (save) {
+            const chks = document.querySelectorAll('.chk');
+            const vals = document.querySelectorAll('.prix-val');
+            save.checkStates.forEach((s, i) => { if(chks[i]) chks[i].checked = s; });
+            save.valueStates.forEach((v, i) => { if(vals[i]) vals[i].value = v; });
+        }
+        calculer();
+    }
+</script>
+
+</body>
+</html>
 

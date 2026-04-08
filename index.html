@@ -1,1 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mon Budget Précis</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; padding: 15px; margin: 0; font-size: 14px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { text-align: center; color: #1976d2; font-size: 1.3rem; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #1976d2; color: white; }
+        .header-pot { background-color: #e3f2fd; font-weight: bold; color: #1565c0; font-size: 0.85rem; }
+        input { width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.9rem; }
+        .total-pot { background-color: #f8f9fa; font-weight: bold; text-align: right; padding-right: 15px; color: #333; }
+        .resultat-final { background-color: #2e7d32; color: white; font-weight: bold; }
+        .revenu-row { background-color: #e8f5e9; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Budget Olivier</h1>
+        <table>
+            <thead><tr><th>Détail</th><th>Montant (€)</th></tr></thead>
+            <tbody>
+                <!-- REVENUS -->
+                <tr class="revenu-row"><td>TOTAL REVENUS</td><td><input type="number" id="rev" value="1800" oninput="calculer()"></td></tr>
+                
+                <!-- POT 1 -->
+                <tr class="header-pot"><td colspan="2">POT 1 : SÉCURITÉ</td></tr>
+                <tr><td>Épargne sécurité</td><td><input type="number" class="p1" value="225" oninput="calculer()"></td></tr>
+                <tr class="total-pot"><td>Total Pot 1</td><td id="tot1">225.00 €</td></tr>
+
+                <!-- POT 2 -->
+                <tr class="header-pot"><td colspan="2">POT 2 : CHARGES (813.09€)</td></tr>
+                <tr><td>Loyer</td><td><input type="number" class="p2" value="300" oninput="calculer()"></td></tr>
+                <tr><td>Essence</td><td><input type="number" class="p2" value="150" oninput="calculer()"></td></tr>
+                <tr><td>Électricité</td><td><input type="number" class="p2" value="137.04" oninput="calculer()"></td></tr>
+                <tr><td>Assurance voiture</td><td><input type="number" class="p2" value="69.05" oninput="calculer()"></td></tr>
+                <tr><td>SFR Box</td><td><input type="number" class="p2" value="47" oninput="calculer()"></td></tr>
+                <tr><td>L'eau</td><td><input type="number" class="p2" value="42.50" oninput="calculer()"></td></tr>
+                <tr><td>Assurance maison</td><td><input type="number" class="p2" value="25.16" oninput="calculer()"></td></tr>
+                <tr><td>SFR Téléphone</td><td><input type="number" class="p2" value="18" oninput="calculer()"></td></tr>
+                <tr><td>Cotisation CIC</td><td><input type="number" class="p2" value="13.35" oninput="calculer()"></td></tr>
+                <tr><td>Prime Vidéo</td><td><input type="number" class="p2" value="6.99" oninput="calculer()"></td></tr>
+                <tr><td>Paramount</td><td><input type="number" class="p2" value="4" oninput="calculer()"></td></tr>
+                <tr><td>HP Imprimante</td><td><input type="number" class="p2" value="1.79" oninput="calculer()"></td></tr>
+                <tr class="total-pot"><td>Total Pot 2</td><td id="tot2">0.00 €</td></tr>
+
+                <!-- POT 3 -->
+                <tr class="header-pot"><td colspan="2">POT 3 : INVESTISSEMENTS (340€)</td></tr>
+                <tr><td>Assurance Vie</td><td><input type="number" class="p3" value="100" oninput="calculer()"></td></tr>
+                <tr><td>Vacances</td><td><input type="number" class="p3" value="100" oninput="calculer()"></td></tr>
+                <tr><td>Bitcoin</td><td><input type="number" class="p3" value="50" oninput="calculer()"></td></tr>
+                <tr><td>ETF PEA</td><td><input type="number" class="p3" value="50" oninput="calculer()"></td></tr>
+                <tr><td>Bitstack</td><td><input type="number" class="p3" value="40" oninput="calculer()"></td></tr>
+                <tr class="total-pot"><td>Total Pot 3</td><td id="tot3">0.00 €</td></tr>
+                <tr><td>Reliquat (ajustement)</td><td><input type="number" id="reliq" value="35" oninput="calculer()"></td></tr>
+
+                <!-- POT 4 -->
+                <tr class="header-pot"><td colspan="2">POT 4 : COURANT / LOISIRS</td></tr>
+                <tr><td>Apport Épouse</td><td><input type="number" id="epouse" value="300" oninput="calculer()"></td></tr>
+                <tr class="resultat-final"><td>DISPO COURSES</td><td id="tot4">0.00 €</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function calculer() {
+            const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+            const sumClass = (cls) => Array.from(document.getElementsByClassName(cls)).reduce((a, b) => a + (parseFloat(b.value) || 0), 0);
+
+            let revenus = getVal('rev');
+            let p1 = sumClass('p1');
+            let p2 = sumClass('p2');
+            let p3 = sumClass('p3');
+            let reliq = getVal('reliq');
+            let epouse = getVal('epouse');
+
+            document.getElementById('tot1').innerText = p1.toFixed(2) + " €";
+            document.getElementById('tot2').innerText = p2.toFixed(2) + " €";
+            document.getElementById('tot3').innerText = p3.toFixed(2) + " €";
+            
+            // Calcul du reste à vivre pour les courses (Revenus - P1 - P2 - P3 - Reliq + Apport Epouse)
+            let reste = (revenus - p1 - p2 - p3 - reliq) + epouse;
+            document.getElementById('tot4').innerText = reste.toFixed(2) + " €";
+        }
+        window.onload = calculer;
+    </script>
+</body>
+</html>
 

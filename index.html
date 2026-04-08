@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mon Suivi Bancaire</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; padding: 15px; margin: 0; font-size: 14px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { text-align: center; color: #1976d2; font-size: 1.3rem; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #1976d2; color: white; }
+        .header-pot { background-color: #e3f2fd; font-weight: bold; color: #1565c0; font-size: 0.85rem; }
+        input[type="number"] { width: 70px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: right; font-size: 0.9rem; }
+        input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; }
+        .checked-row { background-color: #e8f5e9; color: #888; text-decoration: line-through; }
+        .solde-container { margin-top: 15px; background: #fffde7; border: 2px solid #fbc02d; border-radius: 10px; padding: 15px; text-align: center; }
+        .solde-titre { font-size: 0.9rem; color: #856404; font-weight: bold; margin-bottom: 5px; }
+        .solde-montant { font-size: 1.5rem; font-weight: bold; color: #d32f2f; }
+        .resultat-final { background-color: #2e7d32; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Pointage & Solde Réel</h1>
+        
+        <div class="solde-container">
+            <div class="solde-titre">ESTIMATION SOLDE CIC (PRÉLEVÉ)</div>
+            <div id="solde-reel" class="solde-montant">0.00 €</div>
+        </div>
+
+        <br>
+
+        <table>
+            <thead><tr><th>Ok</th><th>Détail</th><th>€</th></tr></thead>
+            <tbody>
+                <tr style="background-color: #e8f5e9; font-weight: bold;"><td></td><td>REVENUS</td><td><input type="number" id="rev" value="1800" oninput="calculer()"></td></tr>
+                
+                <tr class="header-pot"><td colspan="3">POT 1 : SÉCURITÉ</td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Épargne sécurité</td><td><input type="number" class="p-val" value="225" oninput="calculer()"></td></tr>
+                
+                <tr class="header-pot"><td colspan="3">POT 2 : CHARGES</td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Loyer</td><td><input type="number" class="p-val" value="300" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Essence</td><td><input type="number" class="p-val" value="150" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Électricité</td><td><input type="number" class="p-val" value="137.04" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Assurance voiture</td><td><input type="number" class="p-val" value="69.05" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>SFR Box</td><td><input type="number" class="p-val" value="47" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>L'eau</td><td><input type="number" class="p-val" value="42.50" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Assurance maison</td><td><input type="number" class="p-val" value="25.16" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>SFR Téléphone</td><td><input type="number" class="p-val" value="18" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Cotisation CIC</td><td><input type="number" class="p-val" value="13.35" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Prime Vidéo</td><td><input type="number" class="p-val" value="6.99" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Paramount</td><td><input type="number" class="p-val" value="4" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>HP Imprimante</td><td><input type="number" class="p-val" value="1.79" oninput="calculer()"></td></tr>
+                
+                <tr class="header-pot"><td colspan="3">POT 3 : INVESTISSEMENTS</td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Assurance Vie</td><td><input type="number" class="p-val" value="100" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Vacances</td><td><input type="number" class="p-val" value="100" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Bitcoin</td><td><input type="number" class="p-val" value="50" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>ETF PEA</td><td><input type="number" class="p-val" value="50" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Bitstack</td><td><input type="number" class="p-val" value="40" oninput="calculer()"></td></tr>
+                <tr class="item-row"><td><input type="checkbox" class="chk" onchange="calculer()"></td><td>Reliquat</td><td><input type="number" id="reliq" value="35" oninput="calculer()"></td></tr>
+
+                <tr class="header-pot"><td colspan="3">POT 4 : COURANT / LOISIRS</td></tr>
+                <tr><td></td><td>Apport Épouse</td><td><input type="number" id="epouse" value="300" oninput="calculer()"></td></tr>
+                <tr class="resultat-final"><td></td><td>RESTE À VIVRE (Total)</td><td id="tot-reste" style="text-align: right; padding-right:10px;">0.00 €</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function calculer() {
+            let revenus = parseFloat(document.getElementById('rev').value) || 0;
+            let epouse = parseFloat(document.getElementById('epouse').value) || 0;
+            let soldeReel = revenus; // On part du salaire
+            let totalCharges = 0;
+
+            const rows = document.querySelectorAll('.item-row');
+            rows.forEach(row => {
+                const cb = row.querySelector('.chk');
+                const val = parseFloat(row.querySelector('input[type="number"]').value) || 0;
+                
+                totalCharges += val;
+
+                if (cb.checked) {
+                    row.classList.add('checked-row');
+                    soldeReel -= val; // Si coché, on déduit du solde bancaire
+                } else {
+                    row.classList.remove('checked-row');
+                }
+            });
+
+            // Mise à jour de l'affichage
+            document.getElementById('solde-reel').innerText = soldeReel.toFixed(2) + " €";
+            
+            // Calcul du Reste à vivre total (Revenus + Apport - Toutes les charges)
+            let resteTotal = (revenus + epouse) - totalCharges;
+            document.getElementById('tot-reste').innerText = resteTotal.toFixed(2) + " €";
+
+            // Sauvegarde
+            const chks = Array.from(document.querySelectorAll('.chk')).map(c => c.checked);
+            const vals = Array.from(document.querySelectorAll('input[type="number"]')).map(v => v.value);
+            localStorage.setItem('budgetSaveFinal', JSON.stringify({chks, vals}));
+        }
+
+        window.onload = function() {
+            const save = JSON.parse(localStorage.getItem('budgetSaveFinal'));
+            if (save) {
+                const chks = document.querySelectorAll('.chk');
+                const vals = document.querySelectorAll('input[type="number"]');
+                save.chks.forEach((c, i) => { if(chks[i]) chks[i].checked = c; });
+                save.vals.forEach((v, i) => { if(vals[i]) vals[i].value = v; });
+            }
+            calculer();
+        }
+    </script>
+</body>
+</html>
 

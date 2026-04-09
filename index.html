@@ -1,1 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Budget Multi-Pots & Calendrier</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
+        .container { max-width: 500px; margin: 0 auto; }
+        
+        /* Solde et Calendrier */
+        .header-status { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; text-align: center; }
+        #solde-reel { font-size: 1.8rem; font-weight: bold; color: #d32f2f; margin: 5px 0; }
+        
+        .mini-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 10px; }
+        .cal-day { font-size: 0.65rem; padding: 5px; border: 1px solid #eee; border-radius: 4px; color: #ccc; }
+        .cal-active { border-color: #1976d2; color: #1976d2; font-weight: bold; background: #e3f2fd; }
+
+        /* Tables et Pots */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
+        .pot-header { font-weight: bold; color: white; padding: 8px 10px; }
+        .pot1 { background: #1976d2; } .pot2 { background: #fb8c00; } .pot3 { background: #8e24aa; } .pot4 { background: #2e7d32; }
+        
+        input[type="number"], input[type="date"] { border: 1px solid #ddd; border-radius: 4px; padding: 4px; font-size: 0.8rem; }
+        .in-date { width: 40px; } .in-prix { width: 60px; text-align: right; }
+        
+        .checked-row { background-color: #f9f9f9; color: #bbb; text-decoration: line-through; }
+        input[type="checkbox"] { width: 18px; height: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-status">
+        <div style="font-size: 0.8rem; color: #666;">ESTIMATION SOLDE CIC</div>
+        <div id="solde-reel">0.00 €</div>
+        <div class="mini-cal" id="mini-cal"></div>
+    </div>
+
+    <!-- REVENUS -->
+    <table>
+        <tr style="background: #e8f5e9;">
+            <td><b>REVENUS</b></td>
+            <td style="text-align: right;"><input type="number" id="rev" value="1800" oninput="calculer()" class="in-prix"> €</td>
+        </tr>
+    </table>
+
+    <!-- POT 1 -->
+    <div class="pot-header pot1">POT 1 : SÉCURITÉ</div>
+    <table id="table-p1">
+        <tr class="item-row">
+            <td><input type="checkbox" class="chk" onchange="calculer()"></td>
+            <td><input type="number" class="in-date" value="2" oninput="calculer()"></td>
+            <td>Epargne Séc.</td>
+            <td><input type="number" class="in-prix p1" value="225" oninput="calculer()"></td>
+        </tr>
+    </table>
+
+    <!-- POT 2 -->
+    <div class="pot-header pot2">POT 2 : CHARGES FIXES</div>
+    <table id="table-p2">
+        <!-- Les lignes seront générées par JS pour être plus propres -->
+    </table>
+
+    <!-- POT 3 -->
+    <div class="pot-header pot3">POT 3 : INVESTISSEMENTS</div>
+    <table id="table-p3">
+        <!-- Généré par JS -->
+    </table>
+
+    <!-- POT 4 -->
+    <div class="pot-header pot4">POT 4 : COURANT</div>
+    <table>
+        <tr><td>Apport Epouse</td><td style="text-align: right;"><input type="number" id="epouse" value="300" oninput="calculer()" class="in-prix"> €</td></tr>
+        <tr style="background: #f1f8e9;"><td><b>RESTE À VIVRE</b></td><td style="text-align: right;"><b id="tot-reste">0.00 €</b></td></tr>
+    </table>
+</div>
+
+<script>
+    const dataP2 = [
+        {d: 1, n: "Loyer", v: 300}, {d: 5, n: "SFR Box", v: 47}, {d: 5, n: "SFR Tél", v: 18},
+        {d: 7, n: "Assur. Auto", v: 69.05}, {d: 8, n: "EDF", v: 137.04}, {d: 10, n: "Eau", v: 42.50},
+        {d: 12, n: "Assur. Maison", v: 25.16}, {d: 15, n: "Essence", v: 150}, {d: 20, n: "CIC", v: 13.35},
+        {d: 22, n: "Prime", v: 6.99}, {d: 22, n: "Paramount", v: 4}, {d: 25, n: "HP", v: 1.79}
+    ];
+    const dataP3 = [
+        {d: 1, n: "Assur. Vie", v: 100}, {d: 1, n: "Vacances", v: 100}, {d: 28, n: "Crypto", v: 50}, 
+        {d: 28, n: "PEA", v: 50}, {d: 28, n: "Bitstack", v: 40}, {d: 30, n: "Reliquat", v: 35}
+    ];
+
+    function buildTables() {
+        const b2 = document.getElementById('table-p2');
+        dataP2.forEach(x => b2.innerHTML += makeRow(x, 'p2'));
+        const b3 = document.getElementById('table-p3');
+        dataP3.forEach(x => b3.innerHTML += makeRow(x, 'p3'));
+    }
+
+    function makeRow(x, cls) {
+        return `<tr class="item-row">
+            <td><input type="checkbox" class="chk" onchange="calculer()"></td>
+            <td><input type="number" class="in-date" value="${x.d}" oninput="calculer()"></td>
+            <td>${x.n}</td>
+            <td><input type="number" class="in-prix ${cls}" value="${x.v}" oninput="calculer()"></td>
+        </tr>`;
+    }
+
+    function calculer() {
+        let rev = parseFloat(document.getElementById('rev').value) || 0;
+        let epouse = parseFloat(document.getElementById('epouse').value) || 0;
+        let solde = rev;
+        let totalCharges = 0;
+        let activeDates = [];
+
+        document.querySelectorAll('.item-row').forEach(row => {
+            let cb = row.querySelector('.chk');
+            let date = parseInt(row.querySelector('.in-date').value);
+            let prix = parseFloat(row.querySelector('.in-prix').value) || 0;
+            
+            totalCharges += prix;
+            if (cb.checked) {
+                row.classList.add('checked-row');
+                solde -= prix;
+            } else {
+                row.classList.remove('checked-row');
+                if(date) activeDates.push(date);
+            }
+        });
+
+        document.getElementById('solde-reel').innerText = solde.toFixed(2) + " €";
+        document.getElementById('tot-reste').innerText = (rev + epouse - totalCharges).toFixed(2) + " €";
+        
+        updateMiniCal(activeDates);
+        save();
+    }
+
+    function updateMiniCal(activeDates) {
+        const cal = document.getElementById('mini-cal');
+        cal.innerHTML = "";
+        for(let i=1; i<=31; i++) {
+            let isActive = activeDates.includes(i);
+            cal.innerHTML += `<div class="cal-day ${isActive ? 'cal-active' : ''}">${i}</div>`;
+        }
+    }
+
+    function save() {
+        const chks = Array.from(document.querySelectorAll('.chk')).map(c => c.checked);
+        const dates = Array.from(document.querySelectorAll('.in-date')).map(d => d.value);
+        const prix = Array.from(document.querySelectorAll('.in-prix')).map(p => p.value);
+        localStorage.setItem('budgetMasterSave', JSON.stringify({chks, dates, prix}));
+    }
+
+    window.onload = function() {
+        buildTables();
+        const s = JSON.parse(localStorage.getItem('budgetMasterSave'));
+        if(s) {
+            document.querySelectorAll('.chk').forEach((c,i) => c.checked = s.chks[i]);
+            document.querySelectorAll('.in-date').forEach((d,i) => d.value = s.dates[i]);
+            document.querySelectorAll('.in-prix').forEach((p,i) => p.value = s.prix[i]);
+        }
+        calculer();
+    }
+</script>
+</body>
+</html>
 

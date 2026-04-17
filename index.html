@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Budget Multi-Pots & Calendrier</title>
+    <title>Mon Budget - Mars 2026</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
         .container { max-width: 500px; margin: 0 auto; }
         
-        /* Solde et Calendrier */
         .header-status { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; text-align: center; }
         #solde-reel { font-size: 1.8rem; font-weight: bold; color: #d32f2f; margin: 5px 0; }
         
@@ -16,84 +15,95 @@
         .cal-day { font-size: 0.65rem; padding: 5px; border: 1px solid #eee; border-radius: 4px; color: #ccc; }
         .cal-active { border-color: #1976d2; color: #1976d2; font-weight: bold; background: #e3f2fd; }
 
-        /* Tables et Pots */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
-        .pot-header { font-weight: bold; color: white; padding: 8px 10px; }
+        .pot-header { font-weight: bold; color: white; padding: 8px 10px; border-radius: 10px 10px 0 0; }
         .pot1 { background: #1976d2; } .pot2 { background: #fb8c00; } .pot3 { background: #8e24aa; } .pot4 { background: #2e7d32; }
         
-        input[type="number"], input[type="date"] { border: 1px solid #ddd; border-radius: 4px; padding: 4px; font-size: 0.8rem; }
-        .in-date { width: 40px; } .in-prix { width: 60px; text-align: right; }
+        input[type="number"], input[type="text"] { border: 1px solid #ddd; border-radius: 4px; padding: 4px; font-size: 0.8rem; width: 100%; box-sizing: border-box; }
+        .in-date { width: 40px !important; text-align: center; } 
+        .in-prix { width: 70px !important; text-align: right; font-weight: bold; }
         
-        .checked-row { background-color: #f9f9f9; color: #bbb; text-decoration: line-through; }
-        input[type="checkbox"] { width: 18px; height: 18px; }
+        .checked-row { background-color: #f1f8e9; color: #999; }
+        .checked-row td { text-decoration: line-through; }
+        .checked-row input { opacity: 0.5; }
+        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        
+        .recap-final { background: #263238; color: white; padding: 15px; border-radius: 15px; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-status">
-        <div style="font-size: 0.8rem; color: #666;">ESTIMATION SOLDE CIC</div>
+        <div style="font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 1px;">Estimation Solde Compte</div>
         <div id="solde-reel">0.00 €</div>
         <div class="mini-cal" id="mini-cal"></div>
     </div>
 
-    <!-- REVENUS -->
     <table>
         <tr style="background: #e8f5e9;">
-            <td><b>REVENUS</b></td>
-            <td style="text-align: right;"><input type="number" id="rev" value="1800" oninput="calculer()" class="in-prix"> €</td>
+            <td><b>REVENUS (Salaire + Apport)</b></td>
+            <td style="text-align: right;"><input type="number" id="total_revenus" value="2100" oninput="calculer()" class="in-prix"> €</td>
         </tr>
     </table>
 
-    <!-- POT 1 -->
-    <div class="pot-header pot1">POT 1 : SÉCURITÉ</div>
-    <table id="table-p1">
-        <tr class="item-row">
-            <td><input type="checkbox" class="chk" onchange="calculer()"></td>
-            <td><input type="number" class="in-date" value="2" oninput="calculer()"></td>
-            <td>Epargne Séc.</td>
-            <td><input type="number" class="in-prix p1" value="225" oninput="calculer()"></td>
-        </tr>
-    </table>
-
-    <!-- POT 2 -->
-    <div class="pot-header pot2">POT 2 : CHARGES FIXES</div>
+    <div class="pot-header pot2">CHARGES FIXES (Relevé)</div>
     <table id="table-p2">
-        <!-- Les lignes seront générées par JS pour être plus propres -->
-    </table>
+        </table>
 
-    <!-- POT 3 -->
-    <div class="pot-header pot3">POT 3 : INVESTISSEMENTS</div>
+    <div class="pot-header pot3">ÉPARGNE & INVESTISSEMENTS</div>
     <table id="table-p3">
-        <!-- Généré par JS -->
-    </table>
+        </table>
 
-    <!-- POT 4 -->
-    <div class="pot-header pot4">POT 4 : COURANT</div>
-    <table>
-        <tr><td>Apport Epouse</td><td style="text-align: right;"><input type="number" id="epouse" value="300" oninput="calculer()" class="in-prix"> €</td></tr>
-        <tr style="background: #f1f8e9;"><td><b>RESTE À VIVRE</b></td><td style="text-align: right;"><b id="tot-reste">0.00 €</b></td></tr>
-    </table>
+    <div class="pot-header pot4">DÉPENSES COURANTES (À SAISIR)</div>
+    <table id="table-p4">
+        </table>
+
+    <div class="recap-final">
+        <div style="font-size: 0.9rem; opacity: 0.8;">RESTE À VIVRE RÉEL</div>
+        <div id="tot-reste" style="font-size: 1.5rem; font-weight: bold;">0.00 €</div>
+    </div>
 </div>
 
 <script>
-    const dataP2 = [
-        {d: 1, n: "Loyer", v: 300}, {d: 5, n: "SFR Box", v: 47}, {d: 5, n: "SFR Tél", v: 18},
-        {d: 7, n: "Assur. Auto", v: 69.05}, {d: 8, n: "EDF", v: 137.04}, {d: 10, n: "Eau", v: 42.50},
-        {d: 12, n: "Assur. Maison", v: 25.16}, {d: 15, n: "Essence", v: 150}, {d: 20, n: "CIC", v: 13.35},
-        {d: 22, n: "Prime", v: 6.99}, {d: 22, n: "Paramount", v: 4}, {d: 25, n: "HP", v: 1.79}
+    // Vos vraies données extraites
+    const chargesFixes = [
+        {d: 5, n: "Free Mobile", v: 31.98},
+        {d: 5, n: "Free Telecom", v: 59.99},
+        {d: 5, n: "Assur. MMA", v: 69.05},
+        {d: 6, n: "Cotis. CIC", v: 13.35},
+        {d: 9, n: "Eau (Saur)", v: 19.19},
+        {d: 10, n: "Assur. Abeille", v: 25.16},
+        {d: 16, n: "HP Ink", v: 1.79},
+        {d: 18, n: "Amazon Prime", v: 6.99},
+        {d: 23, n: "Amazon Digital", v: 7.99}
     ];
-    const dataP3 = [
-        {d: 1, n: "Assur. Vie", v: 100}, {d: 1, n: "Vacances", v: 100}, {d: 28, n: "Crypto", v: 50}, 
-        {d: 28, n: "PEA", v: 50}, {d: 28, n: "Bitstack", v: 40}, {d: 30, n: "Reliquat", v: 35}
+
+    const investissements = [
+        {d: 23, n: "Assur Vie (1)", v: 50.00},
+        {d: 23, n: "Assur Vie (2)", v: 50.00},
+        {d: 31, n: "Bitstack", v: 14.09}
     ];
 
     function buildTables() {
-        const b2 = document.getElementById('table-p2');
-        dataP2.forEach(x => b2.innerHTML += makeRow(x, 'p2'));
-        const b3 = document.getElementById('table-p3');
-        dataP3.forEach(x => b3.innerHTML += makeRow(x, 'p3'));
+        const p2 = document.getElementById('table-p2');
+        chargesFixes.forEach(x => p2.innerHTML += makeRow(x, 'p2'));
+
+        const p3 = document.getElementById('table-p3');
+        investissements.forEach(x => p3.innerHTML += makeRow(x, 'p3'));
+
+        // Créer 8 lignes vides pour Leclerc/Divers dans le Pot 4
+        const p4 = document.getElementById('table-p4');
+        for(let i=0; i<8; i++) {
+            p4.innerHTML += `
+            <tr class="item-row">
+                <td><input type="checkbox" class="chk" onchange="calculer()"></td>
+                <td><input type="number" class="in-date" placeholder="Jour" oninput="calculer()"></td>
+                <td><input type="text" placeholder="Ex: Leclerc..." oninput="calculer()"></td>
+                <td><input type="number" class="in-prix p4" placeholder="0.00" oninput="calculer()"></td>
+            </tr>`;
+        }
     }
 
     function makeRow(x, cls) {
@@ -106,21 +116,24 @@
     }
 
     function calculer() {
-        let rev = parseFloat(document.getElementById('rev').value) || 0;
-        let epouse = parseFloat(document.getElementById('epouse').value) || 0;
-        let solde = rev;
-        let totalCharges = 0;
+        let totalRev = parseFloat(document.getElementById('total_revenus').value) || 0;
+        let solde = totalRev;
+        let totalDepensesPrévues = 0;
         let activeDates = [];
 
         document.querySelectorAll('.item-row').forEach(row => {
             let cb = row.querySelector('.chk');
-            let date = parseInt(row.querySelector('.in-date').value);
-            let prix = parseFloat(row.querySelector('.in-prix').value) || 0;
+            let dateInput = row.querySelector('.in-date');
+            let prixInput = row.querySelector('.in-prix');
             
-            totalCharges += prix;
+            let date = parseInt(dateInput.value);
+            let prix = parseFloat(prixInput.value) || 0;
+            
+            totalDepensesPrévues += prix;
+
             if (cb.checked) {
                 row.classList.add('checked-row');
-                solde -= prix;
+                solde -= prix; // On déduit du solde ce qui est coché (déjà passé en banque)
             } else {
                 row.classList.remove('checked-row');
                 if(date) activeDates.push(date);
@@ -128,7 +141,7 @@
         });
 
         document.getElementById('solde-reel').innerText = solde.toFixed(2) + " €";
-        document.getElementById('tot-reste').innerText = (rev + epouse - totalCharges).toFixed(2) + " €";
+        document.getElementById('tot-reste').innerText = (totalRev - totalDepensesPrévues).toFixed(2) + " €";
         
         updateMiniCal(activeDates);
         save();
@@ -144,23 +157,38 @@
     }
 
     function save() {
-        const chks = Array.from(document.querySelectorAll('.chk')).map(c => c.checked);
-        const dates = Array.from(document.querySelectorAll('.in-date')).map(d => d.value);
-        const prix = Array.from(document.querySelectorAll('.in-prix')).map(p => p.value);
-        localStorage.setItem('budgetMasterSave', JSON.stringify({chks, dates, prix}));
+        const rowsData = Array.from(document.querySelectorAll('.item-row')).map(row => ({
+            chk: row.querySelector('.chk').checked,
+            date: row.querySelector('.in-date').value,
+            text: row.querySelector('input[type="text"]')?.value || "",
+            prix: row.querySelector('.in-prix').value
+        }));
+        localStorage.setItem('budgetData_Mars', JSON.stringify(rowsData));
+        localStorage.setItem('budgetRev_Mars', document.getElementById('total_revenus').value);
     }
 
     window.onload = function() {
         buildTables();
-        const s = JSON.parse(localStorage.getItem('budgetMasterSave'));
-        if(s) {
-            document.querySelectorAll('.chk').forEach((c,i) => c.checked = s.chks[i]);
-            document.querySelectorAll('.in-date').forEach((d,i) => d.value = s.dates[i]);
-            document.querySelectorAll('.in-prix').forEach((p,i) => p.value = s.prix[i]);
+        
+        // Charger sauvegarde
+        const savedRows = JSON.parse(localStorage.getItem('budgetData_Mars'));
+        const savedRev = localStorage.getItem('budgetRev_Mars');
+        
+        if(savedRev) document.getElementById('total_revenus').value = savedRev;
+        
+        if(savedRows) {
+            document.querySelectorAll('.item-row').forEach((row, i) => {
+                if(savedRows[i]) {
+                    row.querySelector('.chk').checked = savedRows[i].chk;
+                    row.querySelector('.in-date').value = savedRows[i].date;
+                    let txt = row.querySelector('input[type="text"]');
+                    if(txt) txt.value = savedRows[i].text;
+                    row.querySelector('.in-prix').value = savedRows[i].prix;
+                }
+            });
         }
         calculer();
     }
 </script>
 </body>
 </html>
-
